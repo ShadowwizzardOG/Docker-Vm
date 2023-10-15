@@ -2,16 +2,23 @@
 ---
 - hosts: proxmox
   tasks:
+
+    # Voeg de rest van je playbook toe, inclusief het maken van de VM en cloud-init-configuratie
     - name: Create a Proxmox VM
-      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage opslag
+      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage <opslag>
+    - name: Create the directory /var/lib/vz/snippets if it doesn't exist
+      file:
+        path: /var/lib/vz/snippets
+        state: directory
+      become: yes  # Zorg ervoor dat je als beheerder (root) uitvoert
     - name: Add cloud-init configuration
       copy:
         content: |
           #cloud-config
           chpasswd: { expire: False }
           users:
-            - name: michael
-              passwd: school
+            - name: <username>
+              passwd: <wachtwoord>
               lock-passwd: false
           packages:
             - docker.io
@@ -25,3 +32,4 @@
       shell: qm set 100 --cicustom "user=local:snippets/100.cloudinit"
     - name: Start the VM
       shell: qm start 100
+
