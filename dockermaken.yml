@@ -3,7 +3,7 @@
   tasks:
 
     - name: Create a Proxmox VM
-      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --size 30G --net0 model=virtio,bridge=vmbr0 --storage opslag
+      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage opslag
       become: yes
 
     - name: Copy ISO file to VM
@@ -16,6 +16,10 @@
 
     - name: Boot the Iso on the VM
       command: qm set 100 --boot c --bootdisk scsi0
+      become: yes
+
+    - name: Resize the disk to 35G
+      command: qm resize 100 scsi0 +30G
       become: yes
 
     - name: Create the directory /var/lib/vz/snippets if it doesn't exist
