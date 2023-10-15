@@ -1,0 +1,18 @@
+
+  GNU nano 6.2                                        verwijderen.yml                                                 ---
+- name: Stoppen en verwijderen van lxc container
+  hosts: hosts  # Het IP-adres van de Proxmox-node
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Stoppen LXC-containers
+      command: "pct stop {{ item }}"
+      with_sequence: start=100 end=103
+      ignore_errors: yes
+
+    - name: Verwijder LXC-containers
+      command: "pct destroy {{ item }}"
+      with_sequence: start=100 end=103
+      ignore_errors: yes
+
+

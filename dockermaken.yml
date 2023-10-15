@@ -1,24 +1,33 @@
-
 ---
 - hosts: proxmox
   tasks:
 
-    # Voeg de rest van je playbook toe, inclusief het maken van de VM en cloud-init-configuratie
     - name: Create a Proxmox VM
-      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage <opslag>
+      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage opslag
+      become: yes
+
+    - name: Copy ISO file to VM
+      command: qm importdisk 100 /mnt/pve/opslag/ubuntu-23.04-desktop-amd64.iso
+      become: yes
+
+    - name: Attach the ISO to the VM
+      command: qm set 100 --ide2 /mnt.pve/opslag/ubuntu-23.04-desktop-amd64.iso
+      become: yes
+
     - name: Create the directory /var/lib/vz/snippets if it doesn't exist
       file:
         path: /var/lib/vz/snippets
         state: directory
-      become: yes  # Zorg ervoor dat je als beheerder (root) uitvoert
+      become: yes
+
     - name: Add cloud-init configuration
       copy:
         content: |
           #cloud-config
           chpasswd: { expire: False }
           users:
-            - name: <username>
-              passwd: <wachtwoord>
+            - name: michael
+              passwd: $6$mLj6eqwgy78hx6qB$qV7hYMBI1of4TOE.c0dMTruq8sUD0GobdKXm/R5K6ThiALi1kgj5se9fq.PWSws2l3aQoBscuo6H6wKhOuYNQQ0
               lock-passwd: false
           packages:
             - docker.io
@@ -28,8 +37,12 @@
             - 'sudo systemctl enable docker'
             - 'sudo systemctl start docker'
         dest: /var/lib/vz/snippets/100.cloudinit
+      become: yes
+
     - name: Apply cloud-init configuration
       shell: qm set 100 --cicustom "user=local:snippets/100.cloudinit"
+      become: yes
+
     - name: Start the VM
       shell: qm start 100
-
+      become: yes
