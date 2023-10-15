@@ -11,7 +11,7 @@
       become: yes
 
     - name: Attach the ISO to the VM
-      command: qm set 100 --ide2 /mnt/pve/opslag/template/iso/ubuntu-23.04-desktop-amd64.iso opslag
+      command: qm set 100 --boot c --bootdisk scsi0
       become: yes
 
     - name: Create the directory /var/lib/vz/snippets if it doesn't exist
