@@ -9,8 +9,12 @@
     - name: Copy ISO file to VM
       command: qm importdisk 100 /mnt/pve/opslag/template/iso/ubuntu-23.04-desktop-amd64.iso opslag
       become: yes
+    
+    - name: Attach the iso to the VM
+      command: qm set 100 -scsihw virtio-scsi-pci -scsi0 opslag:100/vm-100-disk-0.raw
+      become: yes
 
-    - name: Attach the ISO to the VM
+    - name: Boot the Iso on the VM
       command: qm set 100 --boot c --bootdisk scsi0
       become: yes
 
