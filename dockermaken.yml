@@ -1,0 +1,27 @@
+
+---
+- hosts: proxmox
+  tasks:
+    - name: Create a Proxmox VM
+      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage opslag
+    - name: Add cloud-init configuration
+      copy:
+        content: |
+          #cloud-config
+          chpasswd: { expire: False }
+          users:
+            - name: michael
+              passwd: school
+              lock-passwd: false
+          packages:
+            - docker.io
+          runcmd:
+            - 'sudo apt-get update'
+            - 'sudo apt-get install -y docker.io'
+            - 'sudo systemctl enable docker'
+            - 'sudo systemctl start docker'
+        dest: /var/lib/vz/snippets/100.cloudinit
+    - name: Apply cloud-init configuration
+      shell: qm set 100 --cicustom "user=local:snippets/100.cloudinit"
+    - name: Start the VM
+      shell: qm start 100
