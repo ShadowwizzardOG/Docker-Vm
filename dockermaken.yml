@@ -3,7 +3,7 @@
   tasks:
 
     - name: Create a Proxmox VM
-      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --net0 model=virtio,bridge=vmbr0 --storage opslag
+      shell: qm create 100 --name MyVM --memory 2048 --sockets 1 --cores 2 --size 30G --net0 model=virtio,bridge=vmbr0 --storage opslag
       become: yes
 
     - name: Copy ISO file to VM
