@@ -7,11 +7,11 @@
       become: yes
 
     - name: Copy ISO file to VM
-      command: qm importdisk 100 /mnt/pve/opslag/ubuntu-23.04-desktop-amd64.iso
+      command: qm importdisk 100 /mnt/pve/opslag/ubuntu-23.04-desktop-amd64.iso opslag
       become: yes
 
     - name: Attach the ISO to the VM
-      command: qm set 100 --ide2 /mnt.pve/opslag/ubuntu-23.04-desktop-amd64.iso
+      command: qm set 100 --ide2 /mnt/pve/opslag/ubuntu-23.04-desktop-amd64.iso opslag
       become: yes
 
     - name: Create the directory /var/lib/vz/snippets if it doesn't exist
