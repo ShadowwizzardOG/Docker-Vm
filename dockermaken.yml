@@ -9,6 +9,10 @@
     - name: Set IP Address for the VM
       shell: qm set 100 --ipconfig0 ip=172.16.36.100/16,gw=172.16.0.1
       become: yes
+    
+    - name: Set DNS Server for the VM
+      shell: qm set 100 --nameserver 172.16.0.1
+      become: yes
 
     - name: Copy ISO file to VM
       command: qm importdisk 100 /mnt/pve/opslag/template/iso/ubuntu-23.04-desktop-amd64.iso opslag
