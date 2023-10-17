@@ -1,16 +1,16 @@
 
 ---
-- name: Stoppen en verwijderen van lxc container
-  hosts: hosts  # Het IP-adres van de Proxmox-node
+- name: Stoppen en verwijderen van vm's
+  hosts: vm1, vm2, vm3  # Het IP-adres van de Proxmox-node
   gather_facts: no
   become: yes
   tasks:
-    - name: Stoppen LXC-containers
+    - name: Stoppen vm's
       command: "qm stop {{ item }}"
       with_sequence: start=100 end=103
       ignore_errors: yes
 
-    - name: Verwijder LXC-containers
+    - name: Verwijder vm's
       command: "qm destroy {{ item }}"
       with_sequence: start=100 end=103
       ignore_errors: yes
