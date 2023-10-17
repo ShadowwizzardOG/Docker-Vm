@@ -16,3 +16,38 @@
     - name: Install Docker via Snap
       command: snap install docker
 
+    - name: Check if the simplidocker directory exists
+      stat:
+        path: /home/ubuntu/simplidocker
+      register: dir_check1
+
+    - name: Create directory simplidocker if it doesn't exist
+      command: mkdir -p /home/ubuntu/simplidocker
+      when: not dir_check1.stat.exists
+
+    - name: Check for the existence of simplidocker/dockerfile
+      stat:
+        path: /home/ubuntu/simplidocker/dockerfile
+      register: file_check
+
+    - name: Create Dockerfile if it doesn't exist
+      copy:
+        content: |
+          # Contents of your Dockerfile
+        dest: /home/ubuntu/simplidocker/dockerfile
+      when: not file_check.stat.exists
+
+    - name: Add information to the Dockerfile
+      blockinfile:
+        path: /home/ubuntu/simplidocker/dockerfile
+        block: |
+          FROM ubuntu
+          MAINTAINER simpli
+          RUN apt-get update
+          CMD ["echo", "test"]
+
+    - name: Create a Docker image
+      command: docker build -t image_cloud /home/ubuntu/simplidocker
+
+    - name: Create a new container
+      command: docker run --name cloud_container_1 -d image_cloud
