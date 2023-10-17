@@ -1,0 +1,24 @@
+---
+- name: Initialize Docker Swarm
+  hosts: vm1
+  become: yes
+
+  tasks:
+    - name: Initialize Docker Swarm on vm1
+      command: sudo docker swarm init --advertise-addr 172.16.36.100
+
+- name: Initialize Docker Swarm
+  hosts: vm2
+  become: yes
+
+  tasks:
+    - name: Initialize Docker Swarm on vm2
+      command: sudo docker swarm init --advertise-addr 172.16.36.101
+
+- name: Initialize Docker Swarm
+  hosts: vm3
+  become: yes
+
+  tasks:
+    - name: Initialize Docker Swarm on vm3
+      command: sudo docker swarm init --advertise-addr 172.16.36.102
