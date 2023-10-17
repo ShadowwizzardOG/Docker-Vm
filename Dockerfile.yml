@@ -1,6 +1,7 @@
 ---
 - name: Proxmox Node Setup
-  hosts: hosts
+  hosts: vm1, vm2, vm3
+  
   become: yes  # Dit zorgt ervoor dat de taken met sudo worden uitgevoerd
 
   tasks:
@@ -52,4 +53,3 @@
     - name: Create a new container
       command: docker run --name cloud_container_1 -d image_cloud
 
-      

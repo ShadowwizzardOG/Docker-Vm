@@ -1,6 +1,6 @@
 ---
 - name: Docker compose install
-  hosts: vm
+  hosts: vm1, vm2, vm3
   become: yes  # Dit zorgt ervoor dat de taken met sudo worden uitgevoerd
 
   tasks:
