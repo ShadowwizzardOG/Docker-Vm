@@ -1,0 +1,41 @@
+---
+- name: Docker Commands
+  hosts: vm1, vm2, vm3
+  become: yes
+
+  tasks:
+    - name: Check Docker Version
+      command: docker version
+      register: docker_version
+
+    - name: Display Docker Version
+      debug:
+        var: docker_version.stdout_lines
+      when: docker_version.rc == 0
+
+    - name: List Docker Networks
+      command: docker network ls
+      register: docker_network_ls
+
+    - name: Display Docker Networks
+      debug:
+        var: docker_network_ls.stdout_lines
+      when: docker_network_ls.rc == 0
+
+    - name: List Docker Containers
+      command: docker ps
+      register: docker_ps
+
+    - name: Display Docker Containers
+      debug:
+        var: docker_ps.stdout_lines
+      when: docker_ps.rc == 0
+
+    - name: Inspect Docker Bridge Network
+      command: docker network inspect bridge
+      register: docker_bridge_inspect
+
+    - name: Display Docker Bridge Network Inspection
+      debug:
+        var: docker_bridge_inspect.stdout_lines
+      when: docker_bridge_inspect.rc == 0
