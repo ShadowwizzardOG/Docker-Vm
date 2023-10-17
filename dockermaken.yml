@@ -6,6 +6,10 @@
       shell: qm create 100 --name MyVM --memory 4096 --sockets 1 --cores 4 --net0 model=virtio,bridge=vmbr0 --storage local-lvm --ide2 local-lvm:30
       become: yes
 
+    - name: Set IP Address for the VM
+      shell: qm set 100 --ipconfig0 ip=172.16.36.100/16,gw=172.16.0.1
+      become: yes
+
     - name: Copy ISO file to VM
       command: qm importdisk 100 /mnt/pve/opslag/template/iso/ubuntu-23.04-desktop-amd64.iso opslag
       become: yes
