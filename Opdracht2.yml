@@ -1,0 +1,82 @@
+---
+- name: Generate Docker Compose configuration file
+  hosts:
+    - vm1
+    - vm2
+    - vm3
+  become: true
+  tasks:
+    - name: Create a directory for Docker Compose
+      file:
+        path: /home/ubuntu/compose
+        state: directory
+        mode: '0755'
+
+    - name: Create Docker Compose configuration file
+      copy:
+        content: |
+          version: '3'
+          services:
+            mysql1:
+              image: woahbase/alpine-mysql
+              container_name: mysql1
+              environment:
+                MYSQL_ROOT_PASSWORD: wachtwoord
+                MYSQL_DATABASE: mydb
+                MYSQL_USER: michael
+                MYSQL_PASSWORD: wachtwoord
+              networks:
+                - subnet1
+
+            mysql2:
+              image: woahbase/alpine-mysql
+              container_name: mysql2
+              environment:
+                MYSQL_ROOT_PASSWORD: wachtwoord
+                MYSQL_DATABASE: mydb
+                MYSQL_USER: michael
+                MYSQL_PASSWORD: wachtwoord
+              networks:
+                - subnet2
+
+            mysql3:
+              image: woahbase/alpine-mysql
+              container_name: mysql3
+              environment:
+                MYSQL_ROOT_PASSWORD: wachtwoord
+                MYSQL_DATABASE: mydb
+                MYSQL_USER: michael
+                MYSQL_PASSWORD: wachtwoord
+              networks:
+                - subnet3
+
+          networks:
+            subnet1:
+              driver: bridge
+              ipam:
+                driver: default
+                config:
+                  - subnet: 172.10.0.0/16
+                  - gateway: 172.10.0.1
+
+            subnet2:
+              driver: bridge
+              ipam:
+                driver: default
+                config:
+                  - subnet: 172.20.0.0/16
+                  - gateway: 172.20.0.1
+
+            subnet3:
+              driver: bridge
+              ipam:
+                driver: default
+                config:
+                  - subnet: 172.30.0.0/16
+                  - gateway: 172.30.0.1
+        dest: /home/ubuntu/compose/docker-compose.yml
+
+    - name: Use Docker Compose to start containers
+      command: docker-compose -f /home/ubuntu/compose/docker-compose.yml up -d
+      args:
+        chdir: /home/ubuntu/compose
