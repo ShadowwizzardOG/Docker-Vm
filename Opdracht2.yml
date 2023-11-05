@@ -1,82 +1,64 @@
 ---
-- name: Generate Docker Compose configuration file
-  hosts:
-    - vm1
-    - vm2
-    - vm3
-  become: true
+- name: Create docker subnet network
+  hosts: swarm-master
+  become: no
+
   tasks:
-    - name: Create a directory for Docker Compose
-      file:
-        path: /home/ubuntu/compose
-        state: directory
-        mode: '0755'
+    - name: Create IPVLAN Network
+      community.general.docker_network:
+        name: opdracht2
+        driver: ipvlan
+        driver_options: {"ipvlan_mode": "l3", "parent": "eth0"}
+        ipam_config:
+          - subnet: 192.168.10.0/24
+          - subnet: 192.168.20.0/24
+        state: present
+      register: create_network_result
+    
+    - name: Run MariaDB container 1
+      community.general.docker_container:
+        name: mariadb-subnet1
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: your_root_password
+        ports:
+          - "3307:3306"
+        networks:
+          - name: opdracht2
+            ipv4_address: 192.168.10.2
 
-    - name: Create Docker Compose configuration file
-      copy:
-        content: |
-          version: '3'
-          services:
-            mysql1:
-              image: woahbase/alpine-mysql
-              container_name: mysql1
-              environment:
-                MYSQL_ROOT_PASSWORD: wachtwoord
-                MYSQL_DATABASE: mydb
-                MYSQL_USER: michael
-                MYSQL_PASSWORD: wachtwoord
-              networks:
-                - subnet1
+    - name: Run MariaDB container 2
+      community.general.docker_container:
+        name: mariadb-subnet2
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: your_root_password
+        ports:
+          - "3308:3306"
+        networks:
+          - name: opdracht2
+            ipv4_address: 192.168.20.2
 
-            mysql2:
-              image: woahbase/alpine-mysql
-              container_name: mysql2
-              environment:
-                MYSQL_ROOT_PASSWORD: wachtwoord
-                MYSQL_DATABASE: mydb
-                MYSQL_USER: michael
-                MYSQL_PASSWORD: wachtwoord
-              networks:
-                - subnet2
+    - name: Run Busybox container
+      community.general.docker_container:
+        name: busybox
+        image: busybox
+        command: /bin/sh
+        interactive: yes
+        auto_remove: true
+        networks:
+          - name: opdracht2
+            ipv4_address: 192.168.20.3
 
-            mysql3:
-              image: woahbase/alpine-mysql
-              container_name: mysql3
-              environment:
-                MYSQL_ROOT_PASSWORD: wachtwoord
-                MYSQL_DATABASE: mydb
-                MYSQL_USER: michael
-                MYSQL_PASSWORD: wachtwoord
-              networks:
-                - subnet3
+- name: Add Static Routes to Hosts on Other Subnets
+  hosts: localhost
+  become: yes  
 
-          networks:
-            subnet1:
-              driver: bridge
-              ipam:
-                driver: default
-                config:
-                  - subnet: 172.10.0.0/16
-                  - gateway: 172.10.0.1
+  tasks:
+    - name: Add static routes for subnet1
+      command: ip route add 192.168.10.0/24 via 172.16.36.100
+      ignore_errors: yes  
 
-            subnet2:
-              driver: bridge
-              ipam:
-                driver: default
-                config:
-                  - subnet: 172.20.0.0/16
-                  - gateway: 172.20.0.1
-
-            subnet3:
-              driver: bridge
-              ipam:
-                driver: default
-                config:
-                  - subnet: 172.30.0.0/16
-                  - gateway: 172.30.0.1
-        dest: /home/ubuntu/compose/docker-compose.yml
-
-    - name: Use Docker Compose to start containers
-      command: docker-compose -f /home/ubuntu/compose/docker-compose.yml up -d
-      args:
-        chdir: /home/ubuntu/compose
+    - name: Add static routes for subnet2
+      command: ip route add 192.168.20.0/24 via 172.16.36.100
+      ignore_errors: yes  
