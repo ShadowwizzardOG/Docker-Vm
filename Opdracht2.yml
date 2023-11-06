@@ -1,6 +1,6 @@
 ---
 - name: Create docker subnet network
-  hosts: swarm-master
+  hosts: vm1
   become: no
 
   tasks:

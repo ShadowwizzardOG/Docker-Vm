@@ -1,0 +1,9 @@
+- name: Proxmox Node Setup
+  hosts: vm1, vm2, vm3
+  
+  become: yes  # Dit zorgt ervoor dat de taken met sudo worden uitgevoerd
+  tasks:
+    - name: Remove docker containers
+      command: docker kill mysql1
+      command: docker kill mysql2
+      command: docker kill mysql3
