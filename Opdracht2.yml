@@ -14,11 +14,11 @@
           - subnet: 192.168.20.0/24
         state: present
       register: create_network_result
-    
-    - name: Run MariaDB container 1
+
+    - name: Run MySQL container 1
       community.general.docker_container:
-        name: mariadb-subnet1
-        image: mariadb:latest
+        name: mysql-subnet1
+        image: mysql:latest
         env:
           MYSQL_ROOT_PASSWORD: your_root_password
         ports:
@@ -27,10 +27,10 @@
           - name: opdracht2
             ipv4_address: 192.168.10.2
 
-    - name: Run MariaDB container 2
+    - name: Run MySQL container 2
       community.general.docker_container:
-        name: mariadb-subnet2
-        image: mariadb:latest
+        name: mysql-subnet2
+        image: mysql:latest
         env:
           MYSQL_ROOT_PASSWORD: your_root_password
         ports:
@@ -52,13 +52,13 @@
 
 - name: Add Static Routes to Hosts on Other Subnets
   hosts: localhost
-  become: yes  
+  become: yes
 
   tasks:
     - name: Add static routes for subnet1
-      command: ip route add 192.168.10.0/24 via 172.16.36.100
-      ignore_errors: yes  
+      command: ip route add 192.168.10.0/24 via 172.16.36.101
+      ignore_errors: yes
 
     - name: Add static routes for subnet2
-      command: ip route add 192.168.20.0/24 via 172.16.36.100
-      ignore_errors: yes  
+      command: ip route add 192.168.20.0/24 via 172.16.36.101
+      ignore_errors: yes
